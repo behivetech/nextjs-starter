@@ -6,9 +6,8 @@
         "dev": "next -p 8081",
         "dev:inspect": "NODE_OPTIONS='--inspect' next dev -p 8080",
         "build": "prisma generate && next build",
-        "start": "npm run prisma:start && next start",
+        "start": "next start -p $PORT",
         "start:local": "next start -p 8081",
-        "prisma:start": "docker-compose up && prisma deploy",
         "fix:other": "npm run prettier --write",
         "fix:code": "npm run lint:code --fix",
         "fix": "npm run fix:other && npm run fix:code",
@@ -108,5 +107,8 @@
         "lint-staged": "^10.2.9",
         "prettier": "^2.0.5",
         "prisma": "^1.34.10"
+    },
+    "engines": {
+        "node": "13.x"
     }
 }
