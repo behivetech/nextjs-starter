@@ -1,0 +1,6 @@
+@import '_globals';
+
+.field-error {
+    @include body-regular;
+    color: $color-error;
+}

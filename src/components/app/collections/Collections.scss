@@ -1,0 +1,23 @@
+@import '_globals';
+
+.collections {
+    display: flex;
+    flex-flow: row wrap;
+    margin: $gutter (-$gutter) 0 0;
+    min-height: 100%;
+
+    &__collection {
+        @include body-regular;
+        flex: 0 0 100%;
+        margin: 0 $gutter-small $gutter-small 0;
+
+        @media screen and (min-width: 72rem) {
+            flex: 0 0 23%;
+            margin: 0 $gutter $gutter 0;
+        }
+        @media screen and (max-width: 71rem) and (min-width: 52.5rem) {
+            flex: 0 0 31%;
+            margin: 0 $gutter $gutter 0;
+        }
+    }
+}

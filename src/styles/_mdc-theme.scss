@@ -1,0 +1,26 @@
+@import '_globals';
+
+/*  Typography */
+// To change your theme's typography, we recommend importing a font from Google Fonts and setting the global font-family https://fonts.google.com
+
+$mdc-typography-font-family: $font-family;
+
+/* Shape */
+$mdc-shape-small-component-radius: 4px;
+$mdc-shape-medium-component-radius: 4px;
+$mdc-shape-large-component-radius: 0;
+
+/* Color */
+$mdc-theme-primary: $color-primary;
+$mdc-theme-secondary: $color-secondary;
+
+// Theme background ($mdc-theme-background) appears behind scrollable content. Surface color ($mdc-theme-surface) is mapped to the surface of components such as cards, sheets, and menus. Error color ($mdc-theme-error) is used to indicate an error state for components such as text fields provided with inaccurate input.
+$mdc-theme-surface: $color-surface;
+$mdc-theme-background: $color-background;
+$mdc-theme-error: $color-error;
+
+// “On-” colors define how text, icons, and strokes are colored in relation to the surface on which they appear. If you are updating these manually, be sure to consider accessible color contrast for the value pairs.
+$mdc-theme-on-primary: $color-on-primary;
+$mdc-theme-on-secondary: $color-on-secondary;
+$mdc-theme-on-error: $color-on-error;
+$mdc-theme-on-surface: $color-on-surface;

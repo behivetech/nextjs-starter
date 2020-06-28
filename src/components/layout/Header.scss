@@ -1,0 +1,32 @@
+@import '_globals';
+
+.header {
+    background-color: $color-primary;
+    color: $color-on-primary;
+    position: relative;
+
+    &__headline {
+        display: inline-block;
+        margin-left: $gutter-small;
+    }
+
+    &__right,
+    &__left {
+        position: absolute;
+        top: $gutter-small;
+    }
+
+    &__left {
+        left: $gutter;
+    }
+
+    &__right {
+        right: $gutter;
+        text-align: right;
+    }
+
+    &__nav {
+        margin-top: -0.2rem;
+        vertical-align: middle;
+    }
+}

@@ -1,0 +1,11 @@
+@import '_colors';
+
+.card-action-icons {
+    &--primary {
+        color: $color-primary;
+    }
+
+    &--secondary {
+        color: $color-secondary;
+    }
+}

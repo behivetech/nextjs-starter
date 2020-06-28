@@ -1,0 +1,39 @@
+@import '_colors';
+
+$size-small: 0.75rem;
+$size-medium: 4rem;
+$size-large: 8rem;
+
+.loading-spinner {
+    animation: spin 2s linear infinite;
+    display: inline-block;
+    font-size: $size-large;
+    height: $size-large;
+    overflow: none;
+    width: $size-large;
+
+    &--medium {
+        font-size: $size-medium;
+        height: $size-medium;
+        width: $size-medium;
+    }
+
+    &--small {
+        font-size: $size-small;
+        height: $size-small;
+        width: $size-small;
+    }
+
+    &--on-primary {
+        color: $color-on-primary;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(-360deg);
+    }
+}

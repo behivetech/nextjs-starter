@@ -1,0 +1,19 @@
+@import '_globals';
+
+.main-container {
+    width: 80%;
+    max-width: $main-container-width;
+    margin: 0 auto;
+    padding: 1rem;
+
+    &--full-width {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    @media screen and (max-width: $device-width) {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+}

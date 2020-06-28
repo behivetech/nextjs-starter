@@ -1,0 +1,16 @@
+@import '_globals';
+
+.header-nav-right {
+    &__user {
+        cursor: pointer;
+    }
+
+    &__menu {
+        min-width: 8rem;
+    }
+
+    &__link {
+        @include body-regular;
+        margin-left: $gutter;
+    }
+}

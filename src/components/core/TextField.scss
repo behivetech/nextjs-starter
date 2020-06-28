@@ -1,0 +1,14 @@
+@import '_globals';
+@import '_mdc-theme';
+@import '@material/textfield/mdc-text-field';
+
+.text-field {
+    &--full-width {
+        margin-bottom: $gutter-small;
+        width: 100%;
+    }
+
+    &--textarea {
+        margin-top: $gutter-small;
+    }
+}
