@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import {AuthenticationError} from 'apollo-server-errors';
 
 // Getting a false positive from eslint on no-unused-modules when these are used
 
@@ -13,7 +14,7 @@ export function getUserId(context, forceAuthentication = true) {
     }
 
     if (forceAuthentication && !userId) {
-        throw new Error('Not authenticated');
+        throw new AuthenticationError('Not authenticated');
     }
 
     return userId;

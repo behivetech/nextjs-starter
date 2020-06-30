@@ -1,7 +1,6 @@
 import {useMemo} from 'react';
 import {ApolloClient} from 'apollo-client';
 import {InMemoryCache} from 'apollo-cache-inmemory';
-// import {resolvers, typeDefs} from './schema';
 
 import {getToken} from 'tools/persistValues';
 

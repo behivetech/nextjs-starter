@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import {UserInputError} from 'apollo-server-errors';
 
 import {getUserId, isAuthenticated} from 'graphql/server/token-util';
 
@@ -32,14 +33,14 @@ export const accountResolvers = {
         const user = await context.prisma.user({email: args.email});
 
         if (!user) {
-            throw new Error('Invalid username');
+            throw new UserInputError('Invalid username');
         }
 
         const passwordMatches = await bcrypt.compare(args.password, user.password);
         const token = jwt.sign({userId: user.id}, APP_SECRET);
 
         if (!passwordMatches) {
-            throw new Error('Invalid password');
+            throw new UserInputError('Invalid password');
         }
 
         return {

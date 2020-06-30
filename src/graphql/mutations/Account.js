@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import {ForbiddenError, UserInputError} from 'apollo-server-errors';
 
 import {getUserId} from 'graphql/server/token-util';
 
@@ -23,7 +24,7 @@ export const accountMutations = {
         const userId = getUserId(context);
 
         if (userId !== args.id) {
-            throw new Error('You do not have priveledges to update this user.');
+            throw new ForbiddenError('You do not have priveledges to update this user.');
         }
 
         return context.prisma.updateUser({
@@ -37,7 +38,7 @@ export const accountMutations = {
         let password;
 
         if (userId !== args.id) {
-            throw new Error('You do not have priveledges to update this user.');
+            throw new ForbiddenError('You do not have priveledges to update this user.');
         } else {
             password = await bcrypt.hash(args.password, 10);
         }
