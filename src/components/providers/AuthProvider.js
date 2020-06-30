@@ -5,33 +5,35 @@ import gql from 'graphql-tag';
 
 import useNotifications from 'hooks/useNotifications';
 
-import {
-    getToken,
-    getUser,
-    resetPersistence,
-    setToken,
-    setUser,
-} from 'tools/persistValues';
+import {getUser, resetPersistence, setUser} from 'tools/persistValues';
 
 const SIGNUP = gql`
-    mutation SignupMutation($email: String!, $password: String!, $name: String!) {
-        signup(data: {email: $email, password: $password, name: $name}) {
-            token
+    mutation SIGNUP($email: String!, $password: String!, $name: String!) {
+        signup(input: {email: $email, password: $password, name: $name}) {
+            email
         }
     }
 `;
 
 const LOGIN = gql`
-    query LoginQuery($email: String!, $password: String!) {
+    query LOGIN($email: String!, $password: String!) {
         login(email: $email, password: $password) {
-            token
+            email
         }
     }
 `;
 
+const LOGOUT = gql`
+    query LOGOUT {
+        logout
+    }
+`;
+
 const INITIAL_STATE = {
-    authenticated: !!getToken(),
-    ssr: true,
+    // TODO: Check into getting authenticated set initially
+    authenticated: false,
+    // TODO: Is this really needed?
+    ssr: typeof window === 'undefined',
     authenticating: false,
     error: null,
     username: getUser(),
@@ -61,12 +63,12 @@ function reducer(state, {type, payload = {}}) {
             ...state,
             authenticated: true,
             authenticating: false,
+            username: payload.username,
             error: null,
         },
         SET_AUTHENTICATING: {
             ...INITIAL_STATE,
             authenticating: true,
-            username: payload.username,
         },
         SET_ERROR: {
             authenticated: false,
@@ -108,15 +110,15 @@ export default function AuthProvider({children}) {
     const [loginQuery] = useLazyQuery(LOGIN, {
         onCompleted: loginConfirm,
         onError: handleError,
-        ssr: false,
     });
+    const [logoutQuery] = useLazyQuery(LOGOUT);
     const [signupMutation] = useMutation(SIGNUP, {
         onCompleted: loginConfirm,
         onError: handleError,
     });
 
     function login(email, password, callback = () => null) {
-        dispatch({type: 'SET_AUTHENTICATING', payload: {username: email}});
+        dispatch({type: 'SET_AUTHENTICATING'});
         loginQuery({variables: {email, password}});
         setUser(email);
         callback(state);
@@ -124,21 +126,21 @@ export default function AuthProvider({children}) {
 
     /** Logs out of app */
     function logout() {
+        logoutQuery();
         resetPersistence();
         dispatch({type: 'RESET_STATE'});
         setNotification('You have been successfully logged out');
     }
 
     function signUp(name, email, password) {
-        dispatch({type: 'SET_AUTHENTICATING', payload: {username: email}});
+        dispatch({type: 'SET_AUTHENTICATING'});
         signupMutation({variables: {name, email, password}});
     }
 
     async function loginConfirm(data) {
-        const {token: dataToken} = data.login || data.signup;
+        const {email} = data.login || data.signup;
 
-        await setToken(dataToken);
-        dispatch({type: 'SET_AUTHENTICATED'});
+        dispatch({type: 'SET_AUTHENTICATED', payload: {username: email.email}});
     }
 
     function handleError(errorResponse) {

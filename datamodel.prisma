@@ -2,7 +2,8 @@ type User {
     id: ID! @id
     createdAt: DateTime! @createdAt
     email: String! @unique
-    password: String!
+    hash: String!
+    salt: String!
     name: String!
     updatedAt: DateTime! @updatedAt
 }

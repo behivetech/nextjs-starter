@@ -1,26 +1,24 @@
 import {makeExecutableSchema} from 'graphql-tools';
 
 // TypeDefs
-import {AccountDefs} from '../type-defs/Account';
+import {AccountDefs} from './type-defs/Account';
 
 // Resolvers
-import {accountResolvers} from '../resolvers/Account';
-
-// Resolvers
-import {accountMutations} from '../mutations/Account';
+import {accountResolvers} from './resolvers/Account';
 
 const Query = `type Query`;
 const Mutation = `type Mutation`;
 const typeDefs = [Mutation, Query, AccountDefs];
 const resolvers = {
     Query: {
-        ...accountResolvers,
+        ...accountResolvers.QUERY,
     },
     Mutation: {
-        ...accountMutations,
+        ...accountResolvers.MUTATION,
     },
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export const schema = makeExecutableSchema({
     typeDefs,
     resolvers,

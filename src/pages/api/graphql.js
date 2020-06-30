@@ -1,7 +1,7 @@
 import {ApolloServer} from 'apollo-server-micro';
 import {prisma} from '../../../generated/prisma-client';
 
-import {schema} from 'graphql/server/schema';
+import {schema} from 'graphql/schema';
 
 const apolloServer = new ApolloServer({
     context: (request) => {

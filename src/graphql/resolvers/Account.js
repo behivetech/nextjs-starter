@@ -1,50 +1,106 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import {UserInputError} from 'apollo-server-errors';
+import {ForbiddenError, UserInputError} from 'apollo-server-errors';
+import {omit} from 'lodash';
 
-import {getUserId, isAuthenticated} from 'graphql/server/token-util';
+import {setLoginSession} from '../lib/auth';
+import {
+    getUserId,
+    getUser,
+    getHashSalt,
+    isAuthenticated,
+    validatePassword,
+} from '../lib/user';
+import {removeTokenCookie} from '../lib/auth-cookies';
 
-const APP_SECRET = process.env.APP_SECRET;
-
-function user({id, email}, args, context) {
-    isAuthenticated(context);
-
-    return context.prisma.user({id, email});
-}
-
+// Not sure why eslint doesn't think it's imported.
+// eslint-disable-next-line import/no-unused-modules
 export const accountResolvers = {
-    userByAuth: (parent, args, context) => {
-        const userId = getUserId(context);
+    QUERY: {
+        userByAuth: (parent, args, context) => {
+            isAuthenticated(context);
+            const userId = getUserId(context);
 
-        return user({id: userId}, context);
+            return getUser({id: userId}, context);
+        },
+        userByID: ({id}, args, context) => {
+            isAuthenticated(context);
+            return getUser({id}, context);
+        },
+        userByEmail: ({email}, _, context) => {
+            isAuthenticated(context);
+            return getUser({email}, context);
+        },
+        allUsers: (root, args, context, info) => {
+            isAuthenticated(context);
+
+            return context.prisma.users();
+        },
+        login: async (parent, {email, password}, context, info) => {
+            const user = await getUser({email}, context);
+
+            if (!user) {
+                throw new UserInputError('Invalid username');
+            }
+
+            const passwordMatches = await validatePassword(user, password);
+
+            if (!passwordMatches) {
+                throw new UserInputError('Invalid password');
+            }
+
+            await setLoginSession(context.res, {id: user.id});
+
+            return user;
+        },
+        logout: (_parent, _args, context, _info) => {
+            removeTokenCookie(context.res);
+            return true;
+        },
     },
-    userByID: ({id}, args, context) => {
-        return user({id}, context);
-    },
-    userByEmail: ({email}, _, context) => {
-        return user({email}, context);
-    },
-    allUsers: (root, args, context, info) => {
-        // const userId = getUserId(context);
+    MUTATION: {
+        deleteUser: (_, {id}, context) => {
+            isAuthenticated(context);
+            return context.prisma.deleteUser({id});
+        },
+        signup: async (parent, {input}, context, info) => {
+            const userExists = await getUser({email: input.email}, context);
 
-        return context.prisma.users();
-    },
-    login: async (parent, args, context, info) => {
-        const user = await context.prisma.user({email: args.email});
+            if (userExists) {
+                throw new UserInputError(`User ${userExists.email} already exists`);
+            }
 
-        if (!user) {
-            throw new UserInputError('Invalid username');
-        }
+            const user = await context.prisma.createUser({
+                ...omit(input, 'password'),
+                ...getHashSalt(input.password),
+            });
 
-        const passwordMatches = await bcrypt.compare(args.password, user.password);
-        const token = jwt.sign({userId: user.id}, APP_SECRET);
+            await setLoginSession(context.res, {id: user.id});
 
-        if (!passwordMatches) {
-            throw new UserInputError('Invalid password');
-        }
+            return omit(user, ['hash', 'salt']);
+        },
+        updateUser: (root, args, context) => {
+            const userId = getUserId(context);
 
-        return {
-            token,
-        };
+            // Currently only users can modify themselves in this app unless this
+            // conditional changes to meet other requirements.
+            if (userId !== args.id) {
+                throw new ForbiddenError(
+                    'You do not have priveledges to update this user.'
+                );
+            }
+
+            return context.prisma.updateUser({
+                id: args.id,
+                name: args.name,
+                email: args.email,
+            });
+        },
+        updatePassword: async (root, {password}, context) => {
+            const userId = getUserId(context);
+
+            return context.prisma.updateUser({
+                ...getHashSalt(password),
+                where: {id: userId},
+            });
+        },
     },
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {ApolloProvider} from '@apollo/react-hooks';
 
-import {useApollo} from 'graphql/client/init-apollo';
+import {useApollo} from 'graphql/init-apollo';
 
 import AppProviders from '../components/providers/AppProviders';
 

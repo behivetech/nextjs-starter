@@ -3,17 +3,15 @@ export const AccountDefs = `
         userByID(id: String!): User
         userByEmail(email: String!): User
         userByAuth: User
-        allUsers(data: AllUsersInput): [User!]!
-        login(email: String!, password: String!): Token
+        allUsers(input: AllUsersInput): [User!]!
+        login(email: String!, password: String!): User!
+        logout: Boolean!
     }
     extend type Mutation {
-        signup(data: UserCreateInput): Token
+        signup(input: UserCreateInput): User!
         deleteUser(id: ID!): User!
-        updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+        updateUser(input: UserUpdateInput!, where: UserWhereUniqueInput!): User!
         updatePassword(id: ID!, password: String!): User!
-    }
-    type Token {
-        token: String!
     }
     type User {
         id: ID!
