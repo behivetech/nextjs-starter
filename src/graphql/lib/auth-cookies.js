@@ -5,13 +5,15 @@ const TOKEN_NAME = process.env.TOKEN_NAME;
 export const MAX_AGE = process.env.TOKEN_MAX_AGE;
 
 export function setTokenCookie(res, token) {
+    const isProd = () => process.env.NODE_ENV === 'production';
     const cookie = serialize(TOKEN_NAME, token, {
         maxAge: MAX_AGE,
         expires: new Date(Date.now() + MAX_AGE * 1000),
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        domain: isProd() ? '.offtheeasel.com' : undefined,
+        secure: isProd(),
         path: '/',
-        sameSite: 'lax',
+        sameSite: isProd() ? 'strict' : 'lax',
     });
 
     res.setHeader('Set-Cookie', cookie);
