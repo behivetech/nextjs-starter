@@ -4,9 +4,9 @@ import {prisma} from '../../../generated/prisma-client';
 import {schema} from 'graphql/schema';
 
 const apolloServer = new ApolloServer({
-    context: (request) => {
+    context: (ctx) => {
         return {
-            ...request,
+            ...ctx,
             prisma,
         };
     },

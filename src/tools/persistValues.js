@@ -1,4 +1,3 @@
-const AUTH_TOKEN = 'id';
 const USER = 'user';
 
 function hasLocalStorage() {
@@ -15,7 +14,6 @@ export function getUser() {
 
 export async function resetPersistence() {
     if (hasLocalStorage()) {
-        localStorage.removeItem(AUTH_TOKEN);
         localStorage.removeItem(USER);
     }
 }

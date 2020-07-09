@@ -1,55 +1,37 @@
-import crypto from 'crypto';
 import {AuthenticationError} from 'apollo-server-errors';
-import {getLoginSession} from '../lib/auth';
 import {isString, pickBy} from 'lodash';
 
-function getHash(password, salt) {
-    return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-}
+import {getSessionTokenObject} from 'graphql/lib/auth';
 
-// Nothing like some good ol' hash salt as an extra security measure
-// to protect a user's password (also great on popcorn)
-export function getHashSalt(password) {
-    const salt = crypto.randomBytes(16).toString('hex');
+export async function getUser({id, email, sessionId}, {prisma}) {
+    let user;
 
-    return {
-        hash: getHash(password, salt),
-        salt,
-    };
-}
+    if (sessionId) {
+        const session = await prisma.userSession({id: sessionId});
 
-export async function getUser({id, email}, context) {
-    const whereInput = pickBy({email, id}, isString);
-    return await context.prisma.user(whereInput);
+        user = session ? session.user : undefined;
+    } else {
+        user = await prisma.user(pickBy({email, id}, isString));
+    }
+
+    return user;
 }
 
 export async function getUserId(context, forceAuthentication = true) {
     let userId;
-    const session = await getLoginSession(context.req);
+    const tokenObject = await getSessionTokenObject(context);
 
-    if (forceAuthentication && !session) {
-        throw new AuthenticationError('Not authenticated');
+    if (forceAuthentication && !tokenObject) {
+        throw new AuthenticationError('NOT_AUTHENTICATED');
     }
 
     try {
-        const user = await getUser({id: session.id}, context);
-
-        userId = user.id;
+        userId = tokenObject.userId;
     } catch (e) {
         if (forceAuthentication) {
-            throw new AuthenticationError('User does not exist');
+            throw new AuthenticationError('SESSION_EXPIRED');
         }
     }
 
     return userId;
-}
-
-export function isAuthenticated(context, forceAuthentication = true) {
-    const userId = getUserId(context, forceAuthentication);
-
-    return !!userId;
-}
-
-export async function validatePassword(user, password) {
-    return user.hash === getHash(password, user.salt);
 }

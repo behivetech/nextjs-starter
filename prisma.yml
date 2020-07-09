@@ -1,5 +1,8 @@
 endpoint: ${env:PRISMA_ENDPOINT}
 datamodel: datamodel.prisma
+# TODO: Need to figure this out. Having problems with prisma1 deploy when
+# 'managementApiSecret: ${PRISMA_MANAGEMENT_API_JWT_SECRET}' is set in the docker-compose.yml file
+# secret: this-is-a-jwt-prisma-secret
 
 generate:
     - generator: javascript-client

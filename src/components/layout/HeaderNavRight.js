@@ -4,6 +4,7 @@ import {SimpleMenu, MenuItem} from '@rmwc/menu';
 
 import getClassName from 'tools/getClassName';
 import useAuth from 'hooks/useAuth';
+import useLogout from 'hooks/useLogout';
 
 import Icon from 'components/core/Icon';
 import Link from 'components/core/Link';
@@ -11,7 +12,8 @@ import Link from 'components/core/Link';
 import './HeaderNavRight.scss';
 
 export default function HeaderNavRight({className}) {
-    const {authenticated, logout, username} = useAuth();
+    const {authenticated, name} = useAuth();
+    const {logout} = useLogout();
     const [rootClassName, getChildClass] = getClassName({
         className,
         rootClass: 'header-nav-right',
@@ -53,7 +55,7 @@ export default function HeaderNavRight({className}) {
                 handle={renderIcon()}
                 style={{minWidth: '200px'}}
             >
-                <MenuItem selected>logged in as {username || ''}</MenuItem>
+                <MenuItem selected>logged in as {name || ''}</MenuItem>
                 <MenuItem>
                     <Link
                         className={linkClassName}

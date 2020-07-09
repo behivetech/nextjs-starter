@@ -1,0 +1,9 @@
+@import '_colors';
+
+.graphql-error-response {
+    background-color: $color-surface;
+    color: $color-error;
+    max-height: 20rem;
+    margin-top: 0.5rem;
+    overflow: auto;
+}
