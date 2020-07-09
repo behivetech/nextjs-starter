@@ -4,7 +4,7 @@ import {ApolloProvider} from '@apollo/react-hooks';
 
 import appActionsCreator from './appActions';
 import {APP_INITIAL_STATE} from './appInitialState';
-import {useApollo} from 'graphql/init-apollo';
+import {useApollo} from 'graphql/client';
 
 import AuthProvider from '../AuthProvider';
 import NotificationProvider from '../NotificationProvider';
@@ -16,7 +16,7 @@ export default function AppProvider({children, pageProps}) {
     const appActions = useMemo(() => appActionsCreator(appDispatch), [appDispatch]);
     const apolloClient = useApollo({
         appActions,
-        appState,
+        getAppState: () => appState,
         initialState: pageProps.initialApolloState,
     });
 

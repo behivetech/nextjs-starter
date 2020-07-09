@@ -1,6 +1,7 @@
 import Iron from '@hapi/iron';
 import jwt from 'jsonwebtoken';
-import {AuthenticationError, UserInputError} from 'apollo-server-errors';
+import {AuthenticationError, UserInputError} from 'apollo-server-micro';
+import {get} from 'lodash';
 
 import {getTokenCookie, removeTokenCookie, setTokenCookie} from './server-cookies';
 import {getUser} from 'graphql/lib/user';
@@ -56,7 +57,10 @@ async function getNewTokens({prisma, res}, userId) {
     return accessToken;
 }
 
-export async function getSessionTokenObject({prisma, req}, shouldValidate = true) {
+export async function getSessionTokenObject(
+    {prisma, req, restFetch},
+    shouldValidate = true
+) {
     const token = getTokenCookie(req);
     const tokenObject = token
         ? await Iron.unseal(token, SESSION_TOKEN_SECRET, Iron.defaults)
@@ -70,7 +74,9 @@ export async function getSessionTokenObject({prisma, req}, shouldValidate = true
             !prisma ||
             !(await prisma.userSession({id: tokenObject.sessionId})))
     ) {
-        throw new AuthenticationError('TOKEN_NO_SESSION');
+        if (!restFetch) {
+            throw new AuthenticationError('TOKEN_NO_SESSION');
+        }
     }
 
     return tokenObject;
@@ -78,12 +84,12 @@ export async function getSessionTokenObject({prisma, req}, shouldValidate = true
 
 async function validateAccessToken(context) {
     let verifyResponse = false;
-    const {sessionId, sessionIdKey} = getSessionTokenObject(context);
-    const Authorization = context.req.get('Authorization');
+    const {sessionId, sessionIdKey} = await getSessionTokenObject(context);
+    const authorization = get(context.req, 'headers.authorization');
 
-    if (Authorization) {
-        const accessToken = Authorization.replace('Bearer ', '');
-        const {sessionIdVal} = jwt.verify(accessToken, ACCESS_TOKEN_SECRET) || {};
+    if (authorization) {
+        const accessToken = authorization.replace('Bearer ', '');
+        const {sessionIdVal} = (await jwt.verify(accessToken, ACCESS_TOKEN_SECRET)) || {};
         const tokenMatches = await validateHash(
             {salt: sessionIdKey, hash: sessionIdVal},
             sessionId
@@ -98,13 +104,17 @@ async function validateAccessToken(context) {
     return verifyResponse;
 }
 
+async function validateCookieSession(context) {
+    return true;
+}
+
 export async function getLoginResponse({email, password}, context) {
     const user = await getUser({email}, context);
-    const tokenObject = await getSessionTokenObject(context, false);
+    // const tokenObject = await getSessionTokenObject(context, false);
 
-    if (tokenObject && tokenObject.sessionId) {
-        deleteUserSession(context.prisma, tokenObject.sessionId);
-    }
+    // if (tokenObject && tokenObject.sessionId) {
+    //     deleteUserSession(context.prisma, tokenObject.sessionId);
+    // }
 
     if (!user) {
         throw new UserInputError('USER_INVALID_USERNAME');
@@ -159,6 +169,7 @@ export async function getRefreshTokenResponse(context) {
             accessToken,
             name,
         };
+
         await deleteUserSession(context.prisma, sessionId);
     }
 
@@ -175,6 +186,7 @@ export async function removeLoginSession(context) {
 }
 
 export function ensureSignedIn(context) {
-    return true;
-    // return validateAccessToken(context);
+    return context.ssrRequest
+        ? validateCookieSession(context)
+        : validateAccessToken(context);
 }

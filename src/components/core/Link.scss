@@ -1,6 +1,7 @@
 @import '_globals';
 
 .link {
+    color: $color-primary-light;
     text-decoration: none;
 
     &--no-underline:hover {
@@ -36,13 +37,21 @@
     }
 
     &--button {
-        display: inline-block;
+        background-color: transparent;
         border: none;
-        margin: 0;
-        text-decoration: none;
         cursor: pointer;
+        display: inline-block;
+        margin: 0;
+        outline: 0;
+        padding: 0;
         text-align: center;
-        -webkit-appearance: none;
+        text-decoration: none;
         -moz-appearance: none;
+        -webkit-appearance: none;
+
+        &:focus,
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }

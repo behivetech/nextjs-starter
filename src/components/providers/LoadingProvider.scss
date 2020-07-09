@@ -1,9 +1,0 @@
-@import '_base';
-
-.loading-provider {
-    top: $header-height;
-
-    @media screen and (max-width: $device-width) {
-        top: $header-device-height;
-    }
-}

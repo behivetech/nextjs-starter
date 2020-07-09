@@ -1,2 +1,15 @@
+@import '_colors';
 @import '_mdc-theme';
-@import "@material/icon-button/mdc-icon-button";
+@import '@material/icon-button/mdc-icon-button';
+
+.icon-button {
+    color: $color-primary-light;
+
+    &--on-primary {
+        color: $color-on-primary;
+    }
+
+    &--on-secondary {
+        color: $color-on-secondary;
+    }
+}

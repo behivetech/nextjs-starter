@@ -1,4 +1,4 @@
-export const NOT_AUTHENTICATED = 'Not authenticated';
+export const NOT_AUTHENTICATED = 'Please sign in to view this content.';
 
 export const USER_EXISTING_ACCOUNT = 'This account already exists. Please log in.';
 export const USER_INVALID_PASSWORD = 'Invalid password';
@@ -17,4 +17,4 @@ export const REFRESH_TOKEN_NO_USER =
     'User was not found when trying to refresh the session.';
 
 export const TOKEN_NO_SESSION =
-    'Token has expired or no longer exists. Please try logging in again.';
+    'Login session has expired or no longer exists. Please try logging in again.';

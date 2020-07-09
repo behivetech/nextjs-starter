@@ -5,10 +5,10 @@ import getClassName from 'tools/getClassName';
 
 import './Section.scss';
 
-export default function Section({className, centered, children}) {
+export default function Section({centered, className, children, padding}) {
     const [rootClassName] = getClassName({
         className,
-        modifiers: {centered},
+        modifiers: {centered, padding},
         rootClass: 'section',
     });
 
@@ -16,7 +16,10 @@ export default function Section({className, centered, children}) {
 }
 
 Section.propTypes = {
+    /** Adds styling for a width set by SASS var $main-centered-max-width */
+    centered: PropTypes.bool,
     children: PropTypes.node,
     className: PropTypes.string,
-    centered: PropTypes.string,
+    /** Adds padding to styling set by SASS var $main-padding */
+    padding: PropTypes.bool,
 };

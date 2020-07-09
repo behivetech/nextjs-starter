@@ -8,7 +8,7 @@ import Layout from 'components/layout/Layout';
 // Need to beef this up to actually log into something and get some styling.
 export default function Login({path}) {
     return (
-        <Layout className="home">
+        <Layout className="login-page" title="Login">
             <LoginForm path={path} />;
         </Layout>
     );

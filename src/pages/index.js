@@ -1,17 +1,16 @@
 import React from 'react';
 
-import getClassName from 'tools/getClassName';
-
+// core
 import Headline from 'components/core/Headline';
+
+// layout
 import Layout from 'components/layout/Layout';
 import Section from 'components/layout/Section';
 
 export default function IndexPage() {
-    const [rootClassName, getChildClass] = getClassName({rootClass: 'users-page'});
-
     return (
-        <Layout className={rootClassName} title="home">
-            <Section className={getChildClass('section')}>
+        <Layout className="home-page" title="Home">
+            <Section centered padding>
                 <Headline level={2}>Welcome to the NextJS Starter</Headline>
             </Section>
         </Layout>

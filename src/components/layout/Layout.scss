@@ -1,9 +1,6 @@
-@import '../../styles/_globals';
-
 .layout {
     display: flex;
     flex-direction: column;
-    height: 100vh;
     position: relative;
 
     &__main {
@@ -13,22 +10,27 @@
     }
 
     &__header {
-        flex: 0 0 $header-height;
-
-        @media screen and (max-width: $device-width) {
-            flex: 0 0 $header-device-height;
-        }
-    }
-
-    &__loading {
-        top: $header-height;
-
-        @media screen and (max-width: $device-width) {
-            top: $header-device-height;
-        }
+        flex: 0 0 auto;
     }
 
     &__footer {
-        flex: 0 0 $footer-height;
+        flex: 0 0 auto;
+    }
+
+    &__loading {
+        background-color: rgba(0, 0, 0, 0.6);
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: $z-index-loading;
+    }
+
+    @media print {
+        &__header,
+        &__footer {
+            display: none;
+        }
     }
 }
