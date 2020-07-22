@@ -1,25 +1,26 @@
 @import '_colors';
 
-$size-small: 0.75rem;
+$size-small: 1rem;
 $size-medium: 4rem;
 $size-large: 8rem;
 
 .loading-spinner {
     animation: spin 2s linear infinite;
     display: inline-block;
-    font-size: $size-large;
+    font-size: $size-large !important;
     height: $size-large;
     overflow: none;
     width: $size-large;
 
     &--medium {
-        font-size: $size-medium;
+        font-size: $size-medium !important;
         height: $size-medium;
         width: $size-medium;
     }
 
     &--small {
-        font-size: $size-small;
+        display: inline-flex;
+        font-size: $size-small !important;
         height: $size-small;
         width: $size-small;
     }

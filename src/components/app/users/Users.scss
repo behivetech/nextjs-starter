@@ -1,12 +1,12 @@
 @import '_globals';
 
-.collections {
+.users {
     display: flex;
     flex-flow: row wrap;
     margin: $gutter (-$gutter) 0 0;
     min-height: 100%;
 
-    &__collection {
+    &__user {
         @include body-regular;
         flex: 0 0 100%;
         margin: 0 $gutter-small $gutter-small 0;

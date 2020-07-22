@@ -1,30 +1,63 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import {useRouter} from 'next/router';
-import {CircularProgress} from '@rmwc/circular-progress';
 import {includes} from 'lodash';
 import {useForm} from 'react-hook-form';
+import {useMutation} from '@apollo/react-hooks';
 
 import getClassName from 'tools/getClassName';
+import {required} from 'tools/fieldErrors';
 import useAuth from 'hooks/useAuth';
 
-import Button from '../core/Button';
-import TextField from '../core/TextField';
+import Button from 'components/core/Button';
+import LoadingSpinner from 'components/core/LoadingSpinner';
+import TextField from 'components/core/TextField';
 import SEO from './SEO';
-import ErrorMessage from '../core/ErrorMessage';
 
 import './LoginForm.scss';
 
-const fieldErrors = {
-    required: 'This field is required.',
-};
+const LOGIN = gql`
+    mutation LOGIN($email: String!, $password: String!) {
+        login(email: $email, password: $password) {
+            accessToken
+            name
+        }
+    }
+`;
 
-export default function LoginForm({path}) {
+const SIGNUP = gql`
+    mutation SIGNUP($email: String!, $password: String!, $name: String!) {
+        signup(input: {email: $email, password: $password, name: $name}) {
+            accessToken
+            name
+        }
+    }
+`;
+
+export default function LoginForm({path, register}) {
     const router = useRouter();
-    const [shouldLogin, setShouldLogin] = useState(!includes(path, 'register'));
-    const {authenticated, authenticating, error, login, signUp} = useAuth();
-    const {register, handleSubmit, errors, getValues} = useForm();
+    const [registering, setRegistering] = useState(register);
+    const [mutation, setMutation] = useState(register ? SIGNUP : LOGIN);
+    const {
+        authenticated,
+        authenticating,
+        handleLoggedIn,
+        setAuthenticating,
+        setError,
+    } = useAuth();
+    const [signupMutation] = useMutation(mutation, {
+        onCompleted: handleLoggedIn,
+        onError: handleError,
+    });
+    const {
+        register: fieldRegister,
+        handleSubmit,
+        errors: fieldErrors,
+        getValues,
+    } = useForm();
 
+    // Go to home page once logged in and not on a page with private in the url path.
     useEffect(() => {
         if (!authenticating && authenticated && !includes(path, 'private')) {
             router.push('/');
@@ -39,17 +72,27 @@ export default function LoginForm({path}) {
             : 'Passwords do not match.';
     }
 
+    function handleError(errorResponse) {
+        setError(
+            errorResponse,
+            `There was a problem ${registering ? 'signing up' : 'logging in'}.`,
+            'loginError'
+        );
+    }
+
     function handleOnSubmit({email, password, name}) {
-        if (shouldLogin) {
-            login(email, password);
-        } else {
-            signUp(name, email, password);
-        }
+        const variables = registering ? {email, name, password} : {email, password};
+
+        signupMutation({variables});
+        setAuthenticating();
     }
 
     function handleLoginTypeClick(event) {
+        const newRegistering = !registering;
+
         event.preventDefault();
-        setShouldLogin(!shouldLogin);
+        setRegistering(newRegistering);
+        setMutation(newRegistering ? SIGNUP : LOGIN);
     }
 
     const [rootClassName, getChildClass] = getClassName({rootClass: 'login-form'});
@@ -57,46 +100,46 @@ export default function LoginForm({path}) {
 
     return (
         <React.Fragment>
-            <SEO title={shouldLogin ? 'Login' : 'Sign Up'} />
+            <SEO title={registering ? 'Sign Up' : 'Login'} />
             <form
                 className={rootClassName}
                 onSubmit={handleSubmit(handleOnSubmit)}
                 name="login"
             >
-                {!shouldLogin && (
+                {registering && (
                     <TextField
                         disabled={authenticating}
+                        fieldError={fieldErrors.name}
                         id="loginName"
-                        name="name"
+                        inputRef={fieldRegister({required})}
                         label="Name"
-                        fieldError={errors.name}
-                        inputRef={register({required: fieldErrors.required})}
+                        name="name"
                     />
                 )}
                 <TextField
                     disabled={authenticating}
+                    fieldError={fieldErrors.email}
                     id="loginEmail"
-                    name="email"
+                    inputRef={fieldRegister({required})}
                     label="Email"
-                    inputRef={register({required: fieldErrors.required})}
-                    fieldError={errors.email}
+                    name="email"
                 />
                 <TextField
                     disabled={authenticating}
-                    fieldError={errors.password}
+                    fieldError={fieldErrors.password}
                     id="loginPassword"
-                    inputRef={register({required: fieldErrors.required})}
+                    inputRef={fieldRegister({required})}
                     label="Password"
                     name="password"
                     type="password"
                 />
-                {!shouldLogin && (
+                {registering && (
                     <TextField
                         disabled={authenticating}
-                        fieldError={errors.confirmPassword}
+                        fieldError={fieldErrors.confirmPassword}
                         id="loginConfirmPassword"
-                        inputRef={register({
-                            required: fieldErrors.required,
+                        inputRef={fieldRegister({
+                            required,
                             validate: matchesPassword,
                         })}
                         label="Confirm Password"
@@ -107,17 +150,16 @@ export default function LoginForm({path}) {
                 <Button
                     disabled={authenticating}
                     className={buttonClass}
-                    icon={authenticating && <CircularProgress size="xsmall" />}
+                    icon={authenticating && <LoadingSpinner small />}
                     raised
                     type="submit"
                 >
-                    {shouldLogin ? 'login' : 'create account'}
+                    {registering ? 'create account' : 'login'}
                 </Button>
-                <Button className={buttonClass} onClick={handleLoginTypeClick} outlined>
-                    {shouldLogin ? 'go to sign up page' : 'go to login page'}
+                <Button className={buttonClass} onClick={handleLoginTypeClick}>
+                    {registering ? 'already have an account' : 'create an account'}
                 </Button>
             </form>
-            {error && <ErrorMessage error={error} />}
         </React.Fragment>
     );
 }
@@ -125,4 +167,9 @@ export default function LoginForm({path}) {
 LoginForm.propTypes = {
     /** path from router */
     path: PropTypes.string,
+    register: PropTypes.bool,
+};
+
+LoginForm.defaultProps = {
+    register: false,
 };

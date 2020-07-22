@@ -1,18 +1,9 @@
-import {useContext, useEffect} from 'react';
+import {useContext} from 'react';
 
 import {LoadingContext} from 'components/providers/LoadingProvider';
 
-export default function useGlobalLoading(loadingArg) {
+export default function useGlobalLoading() {
     const {loading, setLoading} = useContext(LoadingContext);
 
-    useEffect(() => {
-        if (loadingArg !== undefined) {
-            setLoading(loadingArg);
-        }
-    }, [loadingArg]);
-
-    return {
-        loading,
-        setLoading,
-    };
+    return {loading, setLoading};
 }

@@ -1,17 +1,18 @@
 export const AccountDefs = `
     extend type Query {
-        userByID(id: String!): User
-        userByEmail(email: String!): User
-        userByAuth: User
-        allUsers(input: AllUsersInput): [User!]!
-        login(email: String!, password: String!): User!
-        logout: Boolean!
+        userByID(id: String!): User @auth
+        userByEmail(email: String!): User @auth
+        userByAuth: User @auth
+        allUsers(input: AllUsersInput): [User!]! @auth
     }
     extend type Mutation {
-        signup(input: UserCreateInput): User!
-        deleteUser(id: ID!): User!
-        updateUser(input: UserUpdateInput!, where: UserWhereUniqueInput!): User!
-        updatePassword(id: ID!, password: String!): User!
+        login(email: String!, password: String!): LoginResponse!
+        logout: Boolean!
+        refreshToken: RefreshResponse!
+        signup(input: UserCreateInput): LoginResponse!
+        deleteUser(id: ID!): User! @auth
+        updateUser(input: UserUpdateInput!, where: UserWhereUniqueInput!): User! @auth
+        updatePassword(id: ID!, password: String!): User! @auth
     }
     type User {
         id: ID!
@@ -19,6 +20,14 @@ export const AccountDefs = `
         email: String!
         name: String!
         updatedAt: String!
+    }
+    type LoginResponse {
+        accessToken: String!
+        name: String!
+    }
+    type RefreshResponse {
+        accessToken: String
+        name: String
     }
     input AllUsersInput {
         first: Int

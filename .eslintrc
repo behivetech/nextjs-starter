@@ -42,7 +42,7 @@
     "import/no-named-as-default": 0,
     "import/no-unused-modules": [1, {
       "ignoreExports": ["src/pages/", "src/components/core"],
-      "src": ["src/"],
+      "src": ["src"],
       "unusedExports": true,
     }],
     "jsx-quotes": 1,

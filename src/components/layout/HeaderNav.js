@@ -21,6 +21,10 @@ export default function HeaderNav({className}) {
             display: 'home',
             to: '/',
         },
+        {
+            display: 'users',
+            to: '/users',
+        },
     ];
 
     function handleIsActive(isActive) {

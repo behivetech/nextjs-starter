@@ -8,53 +8,51 @@ import getClassName from 'tools/getClassName';
 import useGlobalLoading from 'hooks/useGlobalLoading';
 import useNotifications from 'hooks/useNotifications';
 
-import CollectionCard from './CollectionCard';
+import UserCard from './UserCard';
 import Section from 'components/layout/Section';
 
-import './Collections.scss';
+import './Users.scss';
 
-const COLLECTIONS = gql`
-    query Collections {
-        collections {
+const ALL_USERS = gql`
+    query ALL_USERS {
+        allUsers {
             id
-            title
-            contents_count
-            cover
-            owner {
-                id
-                name
-            }
+            name
+            email
         }
     }
 `;
 
-export default function Collections({className}) {
+export default function Users({className}) {
     const [rootClassName, getChildClass] = getClassName({
         className,
-        rootClass: 'collections',
+        rootClass: 'users',
     });
     const {setNotification} = useNotifications();
-    const {loading, error, data} = useQuery(COLLECTIONS);
-
-    useGlobalLoading(loading);
+    const {loading, error, data} = useQuery(ALL_USERS);
+    const {setLoading} = useGlobalLoading();
 
     useEffect(() => {
         if (error) {
             // TODO: Do a better job of the error handling.
             setNotification(JSON.stringify(error));
         }
-    });
+    }, [error]);
+
+    useEffect(() => {
+        setLoading(loading);
+    }, [loading, setLoading]);
 
     return (
         <Section className={rootClassName}>
             {chain(data)
-                .get('collections')
-                .map((collection) => {
+                .get('allUsers')
+                .map((user) => {
                     return (
-                        <CollectionCard
-                            className={getChildClass('collection')}
-                            collection={collection}
-                            key={`collection_${collection.id}`}
+                        <UserCard
+                            className={getChildClass('user')}
+                            user={user}
+                            key={`user_${user.id}`}
                         />
                     );
                 })
@@ -63,6 +61,6 @@ export default function Collections({className}) {
     );
 }
 
-Collections.propTypes = {
+Users.propTypes = {
     className: PropTypes.string,
 };

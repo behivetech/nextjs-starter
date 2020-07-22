@@ -1,43 +1,47 @@
-import React, {useEffect, useState} from 'react';
+import React, {useMemo} from 'react';
 import PropTypes from 'prop-types';
-import Snackbar, {SnackbarAction} from 'components/core/Snackbar';
-
-import useNotifications from 'hooks/useNotifications';
+import Snackbar from 'components/core/Snackbar';
 
 import getClassName from 'tools/getClassName';
 
-export default function NotificationSnackbar({className, name}) {
-    const [rootClassName] = getClassName({className, rootClass: 'notification-snackbar'});
-    const [open, setOpen] = useState(false);
-    const {notification, removeNotification} = useNotifications();
+import Button from 'components/core/Button';
 
-    useEffect(() => {
-        setOpen(!!notification);
-    }, [notification]);
+import './NotificationSnackbar.scss';
+
+export default function NotificationSnackbar({
+    className,
+    notification,
+    removeNotification,
+}) {
+    const [rootClassName] = getClassName({className, rootClass: 'notification-snackbar'});
+    const {message, messageKey, ttl} = useMemo(() => notification || {}, [notification]);
 
     function handleClose(event) {
-        removeNotification();
-        setOpen(false);
+        removeNotification(messageKey);
     }
 
     return (
         <Snackbar
-            className={rootClassName}
-            name={name}
-            open={open}
+            open={!!message}
             onClose={handleClose}
-            message={notification}
-            action={<SnackbarAction label="Dismiss" onClick={handleClose} />}
-            timeout={90000}
+            message={<div className={rootClassName}>{message}</div>}
+            action={
+                <Button onClick={handleClose} raised>
+                    Dismiss
+                </Button>
+            }
+            timeout={ttl || 10000}
         />
     );
 }
 
 NotificationSnackbar.propTypes = {
     className: PropTypes.string,
-    name: PropTypes.string,
-};
-
-NotificationSnackbar.defaultProps = {
-    name: 'mainNotification',
+    notification: PropTypes.shape({
+        message: PropTypes.node.isRequired,
+        messageKey: PropTypes.string.isRequired,
+        ttl: PropTypes.number.isRequired,
+        type: PropTypes.string,
+    }),
+    removeNotification: PropTypes.func.isRequired,
 };

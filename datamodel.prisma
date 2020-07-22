@@ -5,5 +5,13 @@ type User {
     hash: String!
     salt: String!
     name: String!
+    sessions: [UserSession]!
     updatedAt: DateTime! @updatedAt
+}
+
+type UserSession {
+    id: ID! @id
+    createdAt: DateTime! @createdAt
+    ttl: Int!
+    user: User! @relation(link: INLINE)
 }

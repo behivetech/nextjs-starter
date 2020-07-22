@@ -1,34 +1,35 @@
 version: '3'
 services:
-  prisma:
-    image: prismagraphql/prisma:1.34
-    restart: always
-    ports:
-    - "4466:4466"
-    environment:
-      PRISMA_CONFIG: |
-        port: 4466
-        # uncomment the next line and provide the env var PRISMA_MANAGEMENT_API_SECRET=my-secret to activate cluster security
-        # managementApiSecret: my-secret
-        databases:
-          default:
-            connector: postgres
-            host: postgres
-            user: prisma
-            password: prisma
-            rawAccess: true
-            port: 5432
-            migrations: true
-  postgres:
-    image: postgres
-    restart: always
-    # Uncomment the next two lines to connect to your your database from outside the Docker environment, e.g. using a database GUI like Postico
-    # ports:
-    # - "5432:5432"
-    environment:
-      POSTGRES_USER: prisma
-      POSTGRES_PASSWORD: prisma
-    volumes:
-      - postgres:/var/lib/postgresql/data
+    prisma:
+        image: prismagraphql/prisma:1.34
+        restart: always
+        ports:
+            - '4466:4466'
+        environment:
+            PRISMA_CONFIG: |
+                port: 4466
+                # uncomment the next line and provide the env var PRISMA_MANAGEMENT_API_SECRET=my-secret to activate cluster security
+                # TODO: Need to figure this out. Having problems with prisma1 deploy when this is set
+                # managementApiSecret: ${PRISMA_MANAGEMENT_API_JWT_SECRET}
+                databases:
+                  default:
+                    connector: postgres
+                    host: postgres
+                    user: prisma
+                    password: prisma
+                    rawAccess: true
+                    port: 5432
+                    migrations: true
+    postgres:
+        image: postgres
+        restart: always
+        # Uncomment the next two lines to connect to your your database from outside the Docker environment, e.g. using a database GUI like Postico
+        # ports:
+        # - "5432:5432"
+        environment:
+            POSTGRES_USER: ${PRISMA_POSTGRES_USER}
+            POSTGRES_PASSWORD: ${PRISMA_POSTGRES_PASSWORD}
+        volumes:
+            - postgres:/var/lib/postgresql/data
 volumes:
-  postgres:
+    postgres:

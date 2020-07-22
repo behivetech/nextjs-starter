@@ -1,44 +1,65 @@
 import {useMemo} from 'react';
 import {ApolloClient} from 'apollo-client';
 import {InMemoryCache} from 'apollo-cache-inmemory';
+import fetch from 'isomorphic-unfetch';
 
 let apolloClient;
-const httpUri = '/api/graphql';
+const httpLinkUri = '/api/graphql';
 
-function isSSR() {
-    return typeof window === 'undefined';
-}
-
-function createIsomorphLink() {
+/* eslint-disable no-console */
+function createIsomorphLink(
+    {accessToken, ssr},
+    {appAuthenticated, appAuthenticating, appError}
+) {
     let isomorphLink;
 
-    if (isSSR()) {
+    if (ssr) {
         const {SchemaLink} = require('apollo-link-schema');
         const {schema} = require('./schema');
 
         isomorphLink = new SchemaLink({schema});
     } else {
+        const {ApolloLink} = require('apollo-link');
         const {createHttpLink} = require('apollo-link-http');
+        const {onError} = require('apollo-link-error');
+        const {setContext} = require('apollo-link-context');
 
-        isomorphLink = createHttpLink({
-            uri: httpUri,
+        const httpLink = createHttpLink({
+            uri: httpLinkUri,
             credentials: 'same-origin',
+            fetch,
         });
+
+        const authLink = setContext((_request, {headers}) => {
+            return {
+                headers: {
+                    ...headers,
+                    authorization: accessToken ? `bearer ${accessToken}` : '',
+                },
+            };
+        });
+
+        const errorLink = onError(({graphQLErrors, networkError}) => {
+            appError({graphQLErrors, networkError});
+        });
+
+        return ApolloLink.from([authLink, errorLink, httpLink]);
     }
 
     return isomorphLink;
 }
+/* eslint-enable */
 
-function createApolloClient() {
+function createApolloClient(appState, appActions) {
     return new ApolloClient({
-        ssrMode: isSSR(),
-        link: createIsomorphLink(),
+        ssrMode: appState.ssr,
+        link: createIsomorphLink(appState, appActions),
         cache: new InMemoryCache(),
     });
 }
 
-function initializeApollo(initialState = null) {
-    const initApolloClient = apolloClient || createApolloClient();
+function initializeApollo(initialState = null, appState, appActions) {
+    const initApolloClient = apolloClient || createApolloClient(appState, appActions);
 
     // If your page has Next.js data fetching methods that use Apollo Client, the initial state
     // get hydrated here
@@ -49,14 +70,18 @@ function initializeApollo(initialState = null) {
     // For SSG and SSR always create a new Apollo Client
     // If it's the client and the global apolloClient doesn't exist, set the global
     // to the new Apollo Client so it's the same client whenever this is called
-    if (!isSSR() && !apolloClient) {
+    if (!appState.ssr && !apolloClient) {
         apolloClient = initApolloClient;
     }
 
     return initApolloClient;
 }
 
-export function useApollo(initialState) {
-    const store = useMemo(() => initializeApollo(initialState), [initialState]);
-    return store;
+export function useApollo({appActions, appState, initialState}) {
+    const apolloClient = useMemo(
+        () => initializeApollo(initialState, appState, appActions),
+        [initialState]
+    );
+
+    return apolloClient;
 }
