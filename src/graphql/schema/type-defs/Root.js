@@ -1,5 +1,5 @@
 export default `
-directive @auth on FIELD_DEFINITION
+directive @isAuthenticated on FIELD_DEFINITION
 
 type Query {
     _: String

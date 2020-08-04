@@ -1,4 +1,4 @@
-import {makeExecutableSchema} from 'graphql-tools';
+import {makeExecutableSchema} from 'apollo-server-micro';
 
 // TypeDefs
 import typeDefs from './type-defs';

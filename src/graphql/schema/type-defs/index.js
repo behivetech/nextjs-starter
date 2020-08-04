@@ -1,4 +1,4 @@
 import {AccountDefs} from './Account';
-import Root from './root';
+import Root from './Root';
 
 export default [Root, AccountDefs];

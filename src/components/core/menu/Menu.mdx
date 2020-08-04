@@ -1,0 +1,23 @@
+This is a [RMWC Component(s): Menu](https://rmwc.io/menus), on [Github](https://github.com/jamesmfriedman/rmwc/tree/master/src/menu).You can compose a menu with the given components, and manually manage the open state. Menu expects MenuItems as children while MenuSurface is a generic container which can have anything as a child.
+
+Components to be use with the Menu component are SimpleMenu, MenuSurfaceAnchor, MenuSurface, SimpleMenuSurface, MenuItem, MenuLink...
+
+The MenuLink uses a component core Link component which will use the gatsby Link component if
+the `to` prop is set or a regular `<a />` element if the `href` prop is set. It has some specail
+styling on it which will make click event of the element fill the entire space of the MenuItem component which makes it more a11y and device compliant.
+
+```js live=true
+<div>
+    <SimpleMenu handle={<Button>Simple Menu</Button>}>
+        <MenuItem>Cookies</MenuItem>
+        <MenuItem>Pizza</MenuItem>
+        <MenuItem>Icecream</MenuItem>
+    </SimpleMenu>
+
+    <SimpleMenuSurface handle={<Button>Simple Menu Surface</Button>}>
+        <div style={{padding: '1rem'}}>Make the content whatever you want.</div>
+    </SimpleMenuSurface>
+</div>
+```
+
+More info and prop types and other ways to use these components can be found on the [RMWC Component page for Menu](https://rmwc.io/menus).

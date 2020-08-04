@@ -75,8 +75,7 @@ export default function LoginForm({path, register}) {
     function handleError(errorResponse) {
         setError(
             errorResponse,
-            `There was a problem ${registering ? 'signing up' : 'logging in'}.`,
-            'loginError'
+            `There was a problem ${registering ? 'signing up' : 'logging in'}.`
         );
     }
 

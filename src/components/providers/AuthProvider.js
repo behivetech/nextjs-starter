@@ -1,22 +1,10 @@
-import React, {createContext, useEffect, useMemo} from 'react';
+import React, {createContext, useMemo} from 'react';
 import PropTypes from 'prop-types';
-import gql from 'graphql-tag';
-import {useMutation} from '@apollo/react-hooks';
 
 import useGlobalLoading from 'hooks/useGlobalLoading';
 import useNotifications from 'hooks/useNotifications';
 
-import GraphQlErrorResponse from 'components/app/GraphQlErrorResponse';
 import {APP_INITIAL_STATE} from './app/appInitialState';
-
-const REFRESH_TOKEN = gql`
-    mutation REFRESH_TOKEN {
-        refreshToken {
-            accessToken
-            name
-        }
-    }
-`;
 
 const DEFAULT_AUTH_CONTEXT = {
     handleLoggedIn: () => null,
@@ -50,34 +38,11 @@ Provider for authentication. Context returns...
 
 export default function AuthProvider({apolloClient, appActions, appState, children}) {
     const {setLoading} = useGlobalLoading();
-    const {setNotification} = useNotifications();
+    const {setNotification, setGraphQLError} = useNotifications();
     const {appAuthenticated, appAuthenticating, appError, appResetState} = useMemo(
         () => appActions,
         [appActions]
     );
-    const {authInitialized, authenticated} = useMemo(() => appState, [appState]);
-    const [refreshTokenMutation] = useMutation(REFRESH_TOKEN, {
-        client: apolloClient,
-        onCompleted: ({refreshToken}) => {
-            const {accessToken, name} = refreshToken;
-
-            appAuthenticated({
-                accessToken,
-                authenticated: !!accessToken,
-                authInitialized: true,
-                name,
-            });
-        },
-        onError: (errorResponse) => {
-            setError(errorResponse, 'There was an error with authorization.');
-        },
-    });
-
-    useEffect(() => {
-        if (!authInitialized && !authenticated) {
-            refreshTokenMutation();
-        }
-    }, [authenticated, authInitialized, refreshTokenMutation]);
 
     function resetState() {
         setLoading(false);
@@ -101,20 +66,10 @@ export default function AuthProvider({apolloClient, appActions, appState, childr
         appAuthenticating({authenticating: loading});
     }
 
-    function setError(errorResponse, message = null, messageKey = 'authError') {
+    function setError(errorResponse, messagePrefix, ttl) {
         setLoading(false);
-        appError(errorResponse);
-        setNotification({
-            type: 'error',
-            messageKey,
-            message: (
-                <React.Fragment>
-                    {message}
-                    <GraphQlErrorResponse error={errorResponse} />
-                </React.Fragment>
-            ),
-            ttl: -1,
-        });
+        appError({...errorResponse, messagePrefix});
+        setGraphQLError(errorResponse, {messagePrefix, ttl});
     }
 
     function handleLoggedOut(success) {

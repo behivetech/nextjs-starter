@@ -1,18 +1,18 @@
 export const AccountDefs = `
     extend type Query {
-        userByID(id: String!): User @auth
-        userByEmail(email: String!): User @auth
-        userByAuth: User @auth
-        allUsers(input: AllUsersInput): [User!]! @auth
+        userByID(id: String!): User @isAuthenticated
+        userByEmail(email: String!): User @isAuthenticated
+        userByAuth: User @isAuthenticated
+        allUsers(input: AllUsersInput): [User!]! @isAuthenticated
     }
     extend type Mutation {
         login(email: String!, password: String!): LoginResponse!
         logout: Boolean!
         refreshToken: RefreshResponse!
         signup(input: UserCreateInput): LoginResponse!
-        deleteUser(id: ID!): User! @auth
-        updateUser(input: UserUpdateInput!, where: UserWhereUniqueInput!): User! @auth
-        updatePassword(id: ID!, password: String!): User! @auth
+        deleteUser(id: ID!): User! @isAuthenticated
+        updateUser(input: UserUpdateInput!, where: UserWhereUniqueInput!): User! @isAuthenticated
+        updatePassword(id: ID!, password: String!): User! @isAuthenticated
     }
     type User {
         id: ID!

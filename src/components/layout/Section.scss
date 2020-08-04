@@ -2,15 +2,17 @@
 
 .section {
     &--centered {
-        width: 80%;
         margin: 0 auto;
-        max-width: $centered-container-width;
-        padding: $gutter 0;
+        max-width: $container-max-width;
     }
 
-    @media screen and (max-width: $device-width) {
-        width: 100%;
-        margin: 0;
+    &--padding {
         padding: $gutter-small;
+    }
+
+    @media all and (min-width: 35rem) {
+        &--padding {
+            padding: $gutter;
+        }
     }
 }

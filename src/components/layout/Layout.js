@@ -4,14 +4,19 @@ import PropTypes from 'prop-types';
 import getClassName from 'tools/getClassName';
 import useGlobalLoading from 'hooks/useGlobalLoading';
 
-import Header from './Header';
+// core
 import Loading from 'components/core/Loading';
+
+// layout
+import Header from './Header';
 import Main from './Main';
+
+// app
 import SEO from 'components/app/SEO';
 
 import './Layout.scss';
 
-export default function Layout({children, className, description, fullWidth, title}) {
+export default function Layout({children, className, description, title}) {
     const [rootClassName, getChildClass] = getClassName({className, rootClass: 'layout'});
     const {loading} = useGlobalLoading();
 
@@ -19,8 +24,8 @@ export default function Layout({children, className, description, fullWidth, tit
         <div className={rootClassName}>
             <SEO title={title} description={description} />
             <Header className={getChildClass('header')} />
-            <Loading className={getChildClass('loading')} loading={loading} />
-            <Main className={getChildClass('main')} fullWidth={fullWidth}>
+            <Main className={getChildClass('main')}>
+                <Loading className={getChildClass('loading')} loading={loading} />
                 {children}
             </Main>
         </div>
@@ -32,8 +37,6 @@ Layout.propTypes = {
     className: PropTypes.string,
     /** description for meta description of the site */
     description: PropTypes.string,
-    /** Passes prop to Main which sets the main container to 100% wide. */
-    fullWidth: PropTypes.bool,
     /** title for meta title info of the site */
     title: PropTypes.string,
 };

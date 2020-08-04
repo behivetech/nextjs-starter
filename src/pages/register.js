@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import LoginForm from 'components/app/LoginForm';
+// layout
 import Layout from 'components/layout/Layout';
 
-// This is just a quick and dirty form for logging in for testing purposes
-// Need to beef this up to actually log into something and get some styling.
+// app
+import LoginForm from 'components/app/LoginForm';
+
 export default function Register({path}) {
     return (
-        <Layout className="home">
+        <Layout className="register-page" title="Register">
             <LoginForm path={path} register />;
         </Layout>
     );

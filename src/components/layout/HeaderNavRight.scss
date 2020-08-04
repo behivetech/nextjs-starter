@@ -1,16 +1,20 @@
 @import '_globals';
 
 .header-nav-right {
-    &__user {
-        cursor: pointer;
-    }
-
-    &__menu {
-        min-width: 8rem;
-    }
+    align-items: center;
+    display: flex;
+    justify-content: center;
 
     &__link {
-        @include body-regular;
-        margin-left: $gutter;
+        font-size: 1rem;
+        padding: $gutter-small;
+    }
+
+    &__links {
+        margin-right: $gutter-small;
+    }
+
+    &__user {
+        cursor: pointer;
     }
 }

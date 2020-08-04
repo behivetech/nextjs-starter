@@ -4,8 +4,9 @@ export default function reducer(state, {type, payload = {}}) {
     const actions = {
         RESET_STATE: APP_INITIAL_STATE,
         SET_AUTHENTICATED: {
-            authenticated:
-                payload.authenticated !== undefined ? payload.authenticated : true,
+            authInitialized: payload.authInitialized || state.authInitialized,
+            accessToken: payload.accessToken,
+            authenticated: !!payload.accessToken,
             authenticating: false,
             error: null,
             name: payload.name,
