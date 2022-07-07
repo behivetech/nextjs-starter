@@ -86,7 +86,7 @@
         "jwt-decode": "^2.2.0",
         "lodash": "^4.17.19",
         "material-components-web": "^3.2.0",
-        "moment": "^2.27.0",
+        "moment": "^2.29.4",
         "moment-timezone": "^0.5.31",
         "next": "^9.5.1",
         "next-connect": "^0.8.1",
